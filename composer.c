@@ -1,3 +1,6 @@
+#include <unistd.h>
+#define COMMAND "echo"
+
 int main(int argc, char** argv) {
-    return 0;
+    execvp(COMMAND, argv);
 }
