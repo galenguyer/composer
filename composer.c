@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#define COMMAND "echo"
+#include <glob.h>
+
+#define COMMAND "docker-compose"
 
 int main(int argc, char** argv) {
     // TODO: Support docker-compose.yaml too
@@ -9,18 +11,23 @@ int main(int argc, char** argv) {
         fprintf(stderr, "No 'docker-compose.yaml' file found\n");
         exit(1);
     }
-    char* args[argc+2];
+
+    glob_t glob_buf;
+    glob("docker-compose.*.yaml", 0, NULL, &glob_buf);
+
+    char* args[argc+2+(2*glob_buf.gl_pathc)];
     args[0] = COMMAND;
     args[1] = "-f";
     args[2] = "docker-compose.yaml";
-    for (int i = 2; i < argc; i++) {
-        args[i] = argv[i-1];
+    for(size_t i = 0; i < glob_buf.gl_pathc; i++) {
+        args[(2*i)+3] = "-f";
+        args[(2*i)+4] = glob_buf.gl_pathv[i];
     }
-    args[argc+2] = NULL;
-    for(int i = 0; i < argc+2; i++) {
-        printf("%s ", args[i]);
+    for (int i = 1; i < argc; i++) {
+        args[2+(2*glob_buf.gl_pathc)+i] = argv[i];
     }
-    puts("");
+    args[argc+2+(2*glob_buf.gl_pathc)] = NULL;
+
     int result = execvp(COMMAND, args);
     if (result < 0) {
         perror(COMMAND);
