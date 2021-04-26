@@ -29,14 +29,3 @@ uninstall:
 	rm -f "$(PREFIX)/bin/composer"
 	rm -f "$(PREFIX)/share/licenses/composer/LICENSE"
 	#rm -f "$(PREFIX)/share/man/man8/composer.8.gz"
-
-#composer: composer.c
-#	gcc -ggdb -o $@ -std=c99 -Wall $<
-
-.PHONY:watch
-watch: composer
-	while true; do \
-		clear; \
-		(make composer && ./composer) || true; \
-		inotifywait -qe modify ./composer.c; \
-	done
