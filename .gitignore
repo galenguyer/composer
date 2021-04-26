@@ -1,2 +1,4 @@
 # Compiled binary
 composer
+# Signature file for github releases
+composer.sig
